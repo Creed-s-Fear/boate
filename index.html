@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a0208">
+  <title>Lótus Lounge</title>
+  <script type="module" crossorigin src="./assets/index-7467dpn-.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Cu6_U9RU.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="hud" hidden>
+    <div id="crosshair"></div>
+    <div id="prompt" hidden></div>
+    <div id="room"></div>
+    <div id="stats" hidden></div>
+  </div>
+
+  <div id="touch" hidden>
+    <div id="stick"><div id="knob"></div></div>
+    <button id="act" type="button" hidden>Abrir</button>
+  </div>
+
+  <div id="overlay">
+    <div class="card">
+      <p class="eyebrow">ambiente interativo</p>
+      <h1>Lótus Lounge</h1>
+      <div id="loading">
+        <div class="bar"><i id="bar"></i></div>
+        <span id="loadtext">Carregando…</span>
+      </div>
+      <button id="start" type="button" hidden>Entrar</button>
+      <ul class="keys">
+        <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> andar</li>
+        <li><kbd>Mouse</kbd> olhar</li>
+        <li><kbd>Shift</kbd> correr</li>
+        <li><kbd>E</kbd> interagir</li>
+        <li><kbd>G</kbd> qualidade</li>
+      </ul>
+      <p id="quality"></p>
+    </div>
+  </div>
+
+</body>
+</html>
