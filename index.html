@@ -4,19 +4,92 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#0a0208">
-  <title>Lótus Lounge</title>
-  <script type="module" crossorigin src="./assets/index-CxwuBD4b.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-Cu6_U9RU.css">
+  <!-- CSP: só recursos do próprio domínio. 'wasm-unsafe-eval' libera só a compilação de WebAssembly (decodificador meshopt do GLB), não eval de JS. 'unsafe-inline' em style é exigido pelo Vite em dev (CSS injetado). -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' blob: ws: wss:; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Lótus Lounge</title>
+  <script type="module" crossorigin src="./assets/index-Du2OUcno.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CM3NIbbV.css">
   <link id="level" rel="preload" as="fetch" crossorigin="anonymous" href="./models/boate.glb?v=1357a40e33">
 </head>
 <body>
   <canvas id="game"></canvas>
 
+  <!-- Verificação de idade (18+) -->
+  <div id="age-gate" hidden>
+    <div class="card age-card">
+      <p class="eyebrow">conteúdo adulto</p>
+      <h1>Lótus Lounge</h1>
+      <p class="age-warn">Este conteúdo é destinado exclusivamente a maiores de 18 anos.</p>
+      <p class="age-sub">Ao continuar, você confirma que tem 18 anos ou mais e aceita os termos de uso.</p>
+      <button id="age-confirm" type="button">Tenho 18+ — Entrar</button>
+      <button id="age-deny" type="button">Sou menor de 18</button>
+    </div>
+  </div>
+
+  <!-- Cenas -->
+  <div id="cutscene" hidden>
+    <div id="cs-fade"></div>
+    <div id="cs-dialogue" hidden>
+      <span id="cs-speaker"></span>
+      <p id="cs-text"></p>
+      <small id="cs-advance"></small>
+    </div>
+    <div id="cs-choices" hidden></div>
+    <div id="cs-skip">
+      <span>Segure [Esc] para pular</span>
+      <div class="cs-skip-track"><div id="cs-skip-bar"></div></div>
+    </div>
+  </div>
+
   <div id="hud" hidden>
+    <div id="hud-tl" class="panel">
+      <div id="hud-name"></div>
+      <div id="hud-money"></div>
+      <ul id="hud-items"></ul>
+      <div class="meter"><span>Vibe</span><div class="track"><div id="bar-vibe" class="fill vibe"></div></div></div>
+      <div class="meter"><span>Buzz</span><div class="track"><div id="bar-buzz" class="fill buzz"></div></div></div>
+    </div>
+    <div id="hud-tr" class="panel">
+      <div class="row"><span id="hud-clock"></span><span id="hud-fps"></span></div>
+      <div id="hud-zone"></div>
+      <div id="hud-mode"></div>
+      <canvas id="minimap" width="120" height="280"></canvas>
+    </div>
+    <div id="hud-objective"></div>
     <div id="crosshair"></div>
     <div id="prompt" hidden></div>
-    <div id="room"></div>
+    <div id="toasts"></div>
+    <div id="hint">H — controles</div>
+    <div id="help" class="panel" hidden>
+      <h3>Controles</h3>
+      <dl>
+        <dt>WASD / setas</dt><dd>andar · Shift corre</dd>
+        <dt>Mouse</dt><dd>olhar · roda = zoom (3ª pessoa)</dd>
+        <dt>V</dt><dd>alternar 1ª / 3ª pessoa</dd>
+        <dt>E</dt><dd>interagir / sentar / levantar</dd>
+        <dt>C</dt><dd>agachar / levantar</dd>
+        <dt>G</dt><dd>dançar</dd>
+        <dt>Q</dt><dd>qualidade (baixa, média, alta)</dd>
+        <dt>M</dt><dd>som on/off</dd>
+        <dt>Esc</dt><dd>liberar mouse / fechar menu</dd>
+      </dl>
+    </div>
     <div id="stats" hidden></div>
+  </div>
+
+  <div id="menu" class="panel" hidden></div>
+
+  <!-- Chat com as anfitriãs -->
+  <div id="chat" hidden>
+    <div id="chat-header">
+      <span id="chat-name"></span>
+      <span id="chat-hearts"></span>
+      <span id="chat-aff" class="chat-aff-popup" hidden></span>
+    </div>
+    <div id="chat-messages"></div>
+    <div id="chat-options"></div>
   </div>
 
   <div id="touch" hidden>
@@ -26,23 +99,44 @@
 
   <div id="overlay">
     <div class="card">
-      <p class="eyebrow">ambiente interativo</p>
+      <p class="eyebrow">club &amp; lounge · só para maiores de 18</p>
       <h1>Lótus Lounge</h1>
       <div id="loading">
         <div class="bar"><i id="bar"></i></div>
         <span id="loadtext">Carregando…</span>
       </div>
+      <div id="profile">
+        <label for="name-input">Nome do personagem</label>
+        <input id="name-input" type="text" maxlength="16" autocomplete="off" spellcheck="false" placeholder="Visitante">
+        <label>Roupa</label>
+        <div id="swatches"></div>
+        <div id="account" hidden>
+          <p id="account-status" class="account-status" hidden><span id="account-who"></span><button id="acc-logout" type="button">Sair</button></p>
+          <div id="account-form">
+            <label for="acc-user">Conta — fichas com Solana (opcional)</label>
+            <input id="acc-user" type="text" maxlength="20" autocomplete="username" spellcheck="false" placeholder="usuário">
+            <input id="acc-pass" type="password" maxlength="128" autocomplete="current-password" placeholder="senha (mínimo 8)">
+            <div class="acc-buttons">
+              <button id="acc-login" type="button">Entrar na conta</button>
+              <button id="acc-register" type="button">Criar conta</button>
+            </div>
+            <p id="acc-msg" class="account-msg" role="status"></p>
+          </div>
+        </div>
+      </div>
       <button id="start" type="button" hidden>Entrar</button>
       <ul class="keys">
         <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> andar</li>
-        <li><kbd>Mouse</kbd> olhar</li>
-        <li><kbd>Shift</kbd> correr</li>
         <li><kbd>E</kbd> interagir</li>
-        <li><kbd>G</kbd> qualidade</li>
+        <li><kbd>V</kbd> 1ª/3ª pessoa</li>
+        <li><kbd>C</kbd> agachar</li>
+        <li><kbd>G</kbd> dançar</li>
+        <li><kbd>Q</kbd> qualidade</li>
+        <li><kbd>H</kbd> ajuda</li>
       </ul>
       <p id="quality"></p>
     </div>
   </div>
-
+
 </body>
 </html>
