@@ -1,34 +1,34 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#0a0208">
-  <!-- CSP: só recursos do próprio domínio. 'wasm-unsafe-eval' libera só a compilação de WebAssembly (decodificador meshopt do GLB), não eval de JS. 'unsafe-inline' em style é exigido pelo Vite em dev (CSS injetado). -->
+  <!-- CSP: same-origin resources only. 'wasm-unsafe-eval' enables only WebAssembly compilation (GLB meshopt decoder), not JS eval. 'unsafe-inline' in style is required by Vite in dev (injected CSS). -->
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' blob: ws: wss:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
-  <title>Lótus Lounge</title>
-  <script type="module" crossorigin src="./assets/index-Du2OUcno.js"></script>
+  <title>Jack of Hearts</title>
+  <script type="module" crossorigin src="./assets/index-CUKet_0o.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-CM3NIbbV.css">
   <link id="level" rel="preload" as="fetch" crossorigin="anonymous" href="./models/boate.glb?v=1357a40e33">
 </head>
 <body>
   <canvas id="game"></canvas>
 
-  <!-- Verificação de idade (18+) -->
+  <!-- Age verification (18+) -->
   <div id="age-gate" hidden>
     <div class="card age-card">
-      <p class="eyebrow">conteúdo adulto</p>
-      <h1>Lótus Lounge</h1>
-      <p class="age-warn">Este conteúdo é destinado exclusivamente a maiores de 18 anos.</p>
-      <p class="age-sub">Ao continuar, você confirma que tem 18 anos ou mais e aceita os termos de uso.</p>
-      <button id="age-confirm" type="button">Tenho 18+ — Entrar</button>
-      <button id="age-deny" type="button">Sou menor de 18</button>
+      <p class="eyebrow">adult content</p>
+      <h1>Jack of Hearts</h1>
+      <p class="age-warn">This content is intended exclusively for adults aged 18 and over.</p>
+      <p class="age-sub">By continuing, you confirm that you are 18 or older and accept the terms of use.</p>
+      <button id="age-confirm" type="button">I'm 18+ — Enter</button>
+      <button id="age-deny" type="button">I'm under 18</button>
     </div>
   </div>
 
-  <!-- Cenas -->
+  <!-- Cutscenes -->
   <div id="cutscene" hidden>
     <div id="cs-fade"></div>
     <div id="cs-dialogue" hidden>
@@ -38,7 +38,7 @@
     </div>
     <div id="cs-choices" hidden></div>
     <div id="cs-skip">
-      <span>Segure [Esc] para pular</span>
+      <span>Hold [Esc] to skip</span>
       <div class="cs-skip-track"><div id="cs-skip-bar"></div></div>
     </div>
   </div>
@@ -61,19 +61,19 @@
     <div id="crosshair"></div>
     <div id="prompt" hidden></div>
     <div id="toasts"></div>
-    <div id="hint">H — controles</div>
+    <div id="hint">H — controls</div>
     <div id="help" class="panel" hidden>
-      <h3>Controles</h3>
+      <h3>Controls</h3>
       <dl>
-        <dt>WASD / setas</dt><dd>andar · Shift corre</dd>
-        <dt>Mouse</dt><dd>olhar · roda = zoom (3ª pessoa)</dd>
-        <dt>V</dt><dd>alternar 1ª / 3ª pessoa</dd>
-        <dt>E</dt><dd>interagir / sentar / levantar</dd>
-        <dt>C</dt><dd>agachar / levantar</dd>
-        <dt>G</dt><dd>dançar</dd>
-        <dt>Q</dt><dd>qualidade (baixa, média, alta)</dd>
-        <dt>M</dt><dd>som on/off</dd>
-        <dt>Esc</dt><dd>liberar mouse / fechar menu</dd>
+        <dt>WASD / arrows</dt><dd>walk · Shift to run</dd>
+        <dt>Mouse</dt><dd>look · scroll = zoom (3rd person)</dd>
+        <dt>V</dt><dd>toggle 1st / 3rd person</dd>
+        <dt>E</dt><dd>interact / sit / stand</dd>
+        <dt>C</dt><dd>crouch / stand</dd>
+        <dt>G</dt><dd>dance</dd>
+        <dt>Q</dt><dd>quality (low, medium, high)</dd>
+        <dt>M</dt><dd>sound on/off</dd>
+        <dt>Esc</dt><dd>release mouse / close menu</dd>
       </dl>
     </div>
     <div id="stats" hidden></div>
@@ -81,7 +81,7 @@
 
   <div id="menu" class="panel" hidden></div>
 
-  <!-- Chat com as anfitriãs -->
+  <!-- Hostess chat -->
   <div id="chat" hidden>
     <div id="chat-header">
       <span id="chat-name"></span>
@@ -94,45 +94,45 @@
 
   <div id="touch" hidden>
     <div id="stick"><div id="knob"></div></div>
-    <button id="act" type="button" hidden>Abrir</button>
+    <button id="act" type="button" hidden>Open</button>
   </div>
 
   <div id="overlay">
     <div class="card">
-      <p class="eyebrow">club &amp; lounge · só para maiores de 18</p>
-      <h1>Lótus Lounge</h1>
+      <p class="eyebrow">club &amp; lounge · adults only 18+</p>
+      <h1>Jack of Hearts</h1>
       <div id="loading">
         <div class="bar"><i id="bar"></i></div>
-        <span id="loadtext">Carregando…</span>
+        <span id="loadtext">Loading…</span>
       </div>
       <div id="profile">
-        <label for="name-input">Nome do personagem</label>
-        <input id="name-input" type="text" maxlength="16" autocomplete="off" spellcheck="false" placeholder="Visitante">
-        <label>Roupa</label>
+        <label for="name-input">Character name</label>
+        <input id="name-input" type="text" maxlength="16" autocomplete="off" spellcheck="false" placeholder="Guest">
+        <label>Outfit</label>
         <div id="swatches"></div>
         <div id="account" hidden>
-          <p id="account-status" class="account-status" hidden><span id="account-who"></span><button id="acc-logout" type="button">Sair</button></p>
+          <p id="account-status" class="account-status" hidden><span id="account-who"></span><button id="acc-logout" type="button">Log out</button></p>
           <div id="account-form">
-            <label for="acc-user">Conta — fichas com Solana (opcional)</label>
-            <input id="acc-user" type="text" maxlength="20" autocomplete="username" spellcheck="false" placeholder="usuário">
-            <input id="acc-pass" type="password" maxlength="128" autocomplete="current-password" placeholder="senha (mínimo 8)">
+            <label for="acc-user">Account — tokens with Solana (optional)</label>
+            <input id="acc-user" type="text" maxlength="20" autocomplete="username" spellcheck="false" placeholder="username">
+            <input id="acc-pass" type="password" maxlength="128" autocomplete="current-password" placeholder="password (min 8)">
             <div class="acc-buttons">
-              <button id="acc-login" type="button">Entrar na conta</button>
-              <button id="acc-register" type="button">Criar conta</button>
+              <button id="acc-login" type="button">Log in</button>
+              <button id="acc-register" type="button">Create account</button>
             </div>
             <p id="acc-msg" class="account-msg" role="status"></p>
           </div>
         </div>
       </div>
-      <button id="start" type="button" hidden>Entrar</button>
+      <button id="start" type="button" hidden>Enter</button>
       <ul class="keys">
-        <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> andar</li>
-        <li><kbd>E</kbd> interagir</li>
-        <li><kbd>V</kbd> 1ª/3ª pessoa</li>
-        <li><kbd>C</kbd> agachar</li>
-        <li><kbd>G</kbd> dançar</li>
-        <li><kbd>Q</kbd> qualidade</li>
-        <li><kbd>H</kbd> ajuda</li>
+        <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk</li>
+        <li><kbd>E</kbd> interact</li>
+        <li><kbd>V</kbd> 1st/3rd person</li>
+        <li><kbd>C</kbd> crouch</li>
+        <li><kbd>G</kbd> dance</li>
+        <li><kbd>Q</kbd> quality</li>
+        <li><kbd>H</kbd> help</li>
       </ul>
       <p id="quality"></p>
     </div>
